@@ -9,12 +9,14 @@ type ChapterIndexProps = {
   chapters: ResolvedChapter[];
   previews: PreviewImage[];
   activeChapterId: string;
+  onOpenViewer: (slug: string, trigger?: HTMLElement | null) => void;
 };
 
 export default function ChapterIndex({
   chapters,
   previews,
   activeChapterId,
+  onOpenViewer,
 }: ChapterIndexProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -72,11 +74,14 @@ export default function ChapterIndex({
             </div>
           </div>
 
-          <div className="hidden items-end gap-3 md:flex md:flex-col" aria-hidden>
+          <div className="hidden items-end gap-3 md:flex md:flex-col">
             {previews.map((preview) => (
-              <div
+              <button
+                type="button"
                 key={preview.name}
+                onClick={(event) => onOpenViewer(preview.slug, event.currentTarget)}
                 className="relative h-28 w-44 overflow-hidden border border-white/10"
+                aria-label={`Abrir imagem ${preview.alt}`}
               >
                 <Image
                   src={preview.src}
@@ -88,7 +93,7 @@ export default function ChapterIndex({
                   sizes="176px"
                   className="object-cover"
                 />
-              </div>
+              </button>
             ))}
           </div>
         </div>

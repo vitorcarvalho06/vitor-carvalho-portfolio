@@ -1,15 +1,19 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import LightboxViewer from "@/components/LightboxViewer";
+import { getFeaturedIndexBySlug, getFrameIndexBySlug } from "@/lib/gallery";
 import ChapterIndex from "./ChapterIndex";
 import ChapterSection from "./ChapterSection";
 import Hero from "./Hero";
-import Lightbox from "./Lightbox";
 import type {
   HeroImage,
   PreviewImage,
   ResolvedChapter,
+  ResolvedFeaturedFrame,
   ResolvedFrame,
+  ViewerState,
 } from "./types";
 
 type GalleryShellProps = {
@@ -17,54 +21,87 @@ type GalleryShellProps = {
   previewStrip: PreviewImage[];
   chapters: ResolvedChapter[];
   allFrames: ResolvedFrame[];
+  featuredFrames: ResolvedFeaturedFrame[];
 };
-
-function parseFrameLabel(value: string | null, total: number): number | null {
-  if (!value) {
-    return null;
-  }
-
-  const parsed = Number.parseInt(value, 10);
-
-  if (Number.isNaN(parsed) || parsed < 1 || parsed > total) {
-    return null;
-  }
-
-  return parsed - 1;
-}
-
-function getFrameIndexFromLocation(total: number): number | null {
-  const queryFrame = parseFrameLabel(
-    new URL(window.location.href).searchParams.get("frame"),
-    total,
-  );
-
-  if (queryFrame !== null) {
-    return queryFrame;
-  }
-
-  const hashMatch = window.location.hash.match(/^#frame-(\d{1,2})$/i);
-
-  if (!hashMatch) {
-    return null;
-  }
-
-  return parseFrameLabel(hashMatch[1], total);
-}
 
 export default function GalleryShell({
   heroImage,
   previewStrip,
   chapters,
   allFrames,
+  featuredFrames,
 }: GalleryShellProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   const [activeChapterId, setActiveChapterId] = useState(chapters[0]?.id ?? "");
-  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [scrollFrameIndex, setScrollFrameIndex] = useState(0);
 
+  const openerRef = useRef<HTMLElement | null>(null);
+  const hadViewerOpen = useRef(false);
+
   const frameIndexMap = useMemo(
-    () => new Map(allFrames.map((frame, index) => [frame.key, index])),
+    () => new Map(allFrames.map((frame, index) => [frame.slug, index])),
     [allFrames],
+  );
+
+  const featuredIndexMap = useMemo(
+    () => new Map(featuredFrames.map((frame, index) => [frame.slug, index])),
+    [featuredFrames],
+  );
+
+  const viewerState = useMemo<ViewerState | null>(() => {
+    const frameSlug = searchParams.get("frame");
+
+    if (frameSlug) {
+      const index = frameIndexMap.get(frameSlug) ?? getFrameIndexBySlug(frameSlug);
+
+      if (index >= 0 && index < allFrames.length) {
+        return { mode: "frame", index };
+      }
+    }
+
+    const featuredSlug = searchParams.get("featured");
+
+    if (featuredSlug) {
+      const index =
+        featuredIndexMap.get(featuredSlug) ?? getFeaturedIndexBySlug(featuredSlug);
+
+      if (index >= 0 && index < featuredFrames.length) {
+        return { mode: "featured", index };
+      }
+    }
+
+    return null;
+  }, [searchParams, frameIndexMap, featuredIndexMap, allFrames.length, featuredFrames.length]);
+
+  const setViewerQuery = useCallback(
+    (nextViewerState: ViewerState | null) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("frame");
+      params.delete("featured");
+
+      if (nextViewerState) {
+        if (nextViewerState.mode === "frame") {
+          params.set("frame", allFrames[nextViewerState.index].slug);
+        } else {
+          params.set("featured", featuredFrames[nextViewerState.index].slug);
+        }
+      }
+
+      const nextQuery = params.toString();
+      const currentQuery = searchParams.toString();
+
+      if (nextQuery === currentQuery) {
+        return;
+      }
+
+      router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname, {
+        scroll: false,
+      });
+    },
+    [searchParams, router, pathname, allFrames, featuredFrames],
   );
 
   useEffect(() => {
@@ -86,8 +123,7 @@ export default function GalleryShell({
           return;
         }
 
-        const visibleId = visibleEntries[0].target.id;
-        setActiveChapterId(visibleId);
+        setActiveChapterId(visibleEntries[0].target.id);
       },
       {
         rootMargin: "-35% 0px -45% 0px",
@@ -135,7 +171,9 @@ export default function GalleryShell({
           const bCenter =
             b.boundingClientRect.top + b.boundingClientRect.height / 2;
 
-          return Math.abs(aCenter - viewportCenter) - Math.abs(bCenter - viewportCenter);
+          return (
+            Math.abs(aCenter - viewportCenter) - Math.abs(bCenter - viewportCenter)
+          );
         })[0];
 
         const key = (bestEntry.target as HTMLElement).dataset.frameKey;
@@ -166,93 +204,80 @@ export default function GalleryShell({
   }, [frameIndexMap]);
 
   useEffect(() => {
-    const syncFromLocation = () => {
-      const index = getFrameIndexFromLocation(allFrames.length);
-      setLightboxIndex(index);
-    };
-
-    syncFromLocation();
-    window.addEventListener("hashchange", syncFromLocation);
-    window.addEventListener("popstate", syncFromLocation);
-
-    return () => {
-      window.removeEventListener("hashchange", syncFromLocation);
-      window.removeEventListener("popstate", syncFromLocation);
-    };
-  }, [allFrames.length]);
-
-  useEffect(() => {
-    const url = new URL(window.location.href);
-    const frameHashPattern = /^#frame-\d{1,2}$/i;
-
-    if (lightboxIndex === null) {
-      url.searchParams.delete("frame");
-
-      if (frameHashPattern.test(url.hash)) {
-        url.hash = "";
-      }
-    } else {
-      const label = String(lightboxIndex + 1).padStart(2, "0");
-      url.searchParams.set("frame", label);
-      url.hash = `frame-${label}`;
-    }
-
-    window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
-  }, [lightboxIndex]);
-
-  const currentFrame = lightboxIndex !== null ? allFrames[lightboxIndex] : null;
-  const previousFrameSrc =
-    lightboxIndex !== null
-      ? allFrames[(lightboxIndex - 1 + allFrames.length) % allFrames.length]?.src
-      : null;
-  const nextFrameSrc =
-    lightboxIndex !== null
-      ? allFrames[(lightboxIndex + 1) % allFrames.length]?.src
-      : null;
-
-  const openLightbox = (frame: ResolvedFrame) => {
-    const index = frameIndexMap.get(frame.key);
-
-    if (index === undefined) {
+    if (viewerState) {
+      hadViewerOpen.current = true;
       return;
     }
 
-    setLightboxIndex(index);
-  };
+    if (!hadViewerOpen.current) {
+      return;
+    }
 
-  const closeLightbox = () => {
-    setLightboxIndex(null);
-  };
+    hadViewerOpen.current = false;
+    const target = openerRef.current;
+    openerRef.current = null;
 
-  const nextFrame = () => {
-    setLightboxIndex((previous) => {
-      if (previous === null) {
-        return 0;
+    if (!target) {
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      target.focus();
+    });
+  }, [viewerState]);
+
+  const openViewer = useCallback(
+    (slug: string, trigger?: HTMLElement | null) => {
+      const frameIndex = frameIndexMap.get(slug);
+
+      if (frameIndex !== undefined) {
+        openerRef.current = trigger ?? (document.activeElement as HTMLElement | null);
+        setViewerQuery({ mode: "frame", index: frameIndex });
+        return;
       }
 
-      return (previous + 1) % allFrames.length;
-    });
-  };
+      const featuredIndex = featuredIndexMap.get(slug);
 
-  const previousFrame = () => {
-    setLightboxIndex((previous) => {
-      if (previous === null) {
-        return 0;
+      if (featuredIndex !== undefined) {
+        openerRef.current = trigger ?? (document.activeElement as HTMLElement | null);
+        setViewerQuery({ mode: "featured", index: featuredIndex });
+      }
+    },
+    [frameIndexMap, featuredIndexMap, setViewerQuery],
+  );
+
+  const closeViewer = useCallback(() => {
+    setViewerQuery(null);
+  }, [setViewerQuery]);
+
+  const changeViewerIndex = useCallback(
+    (nextIndex: number) => {
+      if (!viewerState) {
+        return;
       }
 
-      return (previous - 1 + allFrames.length) % allFrames.length;
-    });
-  };
+      const total =
+        viewerState.mode === "frame" ? allFrames.length : featuredFrames.length;
+      const normalizedIndex = ((nextIndex % total) + total) % total;
+      setViewerQuery({ mode: viewerState.mode, index: normalizedIndex });
+    },
+    [viewerState, allFrames.length, featuredFrames.length, setViewerQuery],
+  );
 
   return (
     <div className="bg-[#0a0a0a] text-[#f5f5f5]">
-      <Hero heroImage={heroImage} frameCount={allFrames.length} />
+      <Hero
+        heroImage={heroImage}
+        frameCount={allFrames.length}
+        onOpenViewer={openViewer}
+      />
 
       <main id="gallery">
         <ChapterIndex
           chapters={chapters}
           previews={previewStrip}
           activeChapterId={activeChapterId}
+          onOpenViewer={openViewer}
         />
 
         {chapters.map((chapter, index) => (
@@ -260,7 +285,7 @@ export default function GalleryShell({
             key={chapter.id}
             chapter={chapter}
             prioritizeFeatured={index === 0}
-            onOpenFrame={openLightbox}
+            onOpenViewer={openViewer}
           />
         ))}
 
@@ -301,16 +326,12 @@ export default function GalleryShell({
         </section>
       </main>
 
-      <Lightbox
-        isOpen={lightboxIndex !== null}
-        frame={currentFrame}
-        currentIndex={lightboxIndex ?? 0}
-        total={allFrames.length}
-        previousSrc={previousFrameSrc}
-        nextSrc={nextFrameSrc}
-        onClose={closeLightbox}
-        onNext={nextFrame}
-        onPrev={previousFrame}
+      <LightboxViewer
+        viewerState={viewerState}
+        frameItems={allFrames}
+        featuredItems={featuredFrames}
+        onClose={closeViewer}
+        onChangeIndex={changeViewerIndex}
       />
 
       <div
@@ -324,4 +345,3 @@ export default function GalleryShell({
     </div>
   );
 }
-

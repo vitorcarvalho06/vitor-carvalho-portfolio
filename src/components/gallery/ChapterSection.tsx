@@ -3,18 +3,18 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import type { ResolvedChapter, ResolvedFrame } from "./types";
+import type { ResolvedChapter } from "./types";
 
 type ChapterSectionProps = {
   chapter: ResolvedChapter;
   prioritizeFeatured?: boolean;
-  onOpenFrame: (frame: ResolvedFrame) => void;
+  onOpenViewer: (slug: string, trigger?: HTMLElement | null) => void;
 };
 
 export default function ChapterSection({
   chapter,
   prioritizeFeatured = false,
-  onOpenFrame,
+  onOpenViewer,
 }: ChapterSectionProps) {
   return (
     <section
@@ -49,8 +49,10 @@ export default function ChapterSection({
       >
         <button
           type="button"
-          onClick={() => onOpenFrame(chapter.featured)}
-          data-frame-key={chapter.featured.key}
+          onClick={(event) =>
+            onOpenViewer(chapter.featured.slug, event.currentTarget)
+          }
+          data-frame-key={chapter.featured.slug}
           className="group w-full text-left focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white"
           aria-label={`Abrir frame ${chapter.featured.name}`}
         >
@@ -88,8 +90,8 @@ export default function ChapterSection({
             <button
               key={image.key}
               type="button"
-              onClick={() => onOpenFrame(image)}
-              data-frame-key={image.key}
+              onClick={(event) => onOpenViewer(image.slug, event.currentTarget)}
+              data-frame-key={image.slug}
               className="group text-left focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white"
               aria-label={`Abrir frame ${image.name}`}
             >

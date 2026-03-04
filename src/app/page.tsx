@@ -1,126 +1,142 @@
 import GalleryShell from "@/components/gallery/GalleryShell";
+import { Suspense } from "react";
 import type {
   HeroImage,
   PreviewImage,
   ResolvedChapter,
+  ResolvedFeaturedFrame,
   ResolvedFrame,
 } from "@/components/gallery/types";
-import { allFrames, chapters } from "@/data/gallery";
+import { chapters } from "@/data/gallery";
 import { getAssetData } from "@/lib/assets";
+import {
+  allFrames,
+  chapterItems,
+  featuredItems,
+  formatTitleFromSlug,
+} from "@/lib/gallery";
 
-const chapterLookup = new Map(chapters.map((chapter) => [chapter.id, chapter]));
+const chapterItemLookup = new Map(chapterItems.map((item) => [item.slug, item]));
 
-function formatAssetName(name: string): string {
-  return name.replaceAll("_", " ");
+function frameAlt(chapterTitle: string, slug: string): string {
+  return `${chapterTitle} - ${formatTitleFromSlug(slug)}`;
 }
 
-function formatFrameAlt(chapterTitle: string, name: string): string {
-  return `${chapterTitle} - ${formatAssetName(name)}`;
-}
+async function resolveFrame(slug: string): Promise<ResolvedFrame> {
+  const item = chapterItemLookup.get(slug);
 
-async function createFrame(
-  chapterId: string,
-  chapterNumber: string,
-  chapterTitle: string,
-  name: string,
-): Promise<ResolvedFrame> {
-  const asset = await getAssetData(name, "outras");
+  if (!item) {
+    throw new Error(`Frame nao encontrado para slug ${slug}`);
+  }
+
+  const asset = await getAssetData(slug, "outras");
+  const title = formatTitleFromSlug(slug);
 
   return {
-    key: `${chapterId}:${name}`,
-    name,
+    key: `${item.chapterId}:${slug}`,
+    slug,
+    name: slug,
     src: asset.src,
     blurDataURL: asset.blurDataURL,
-    alt: formatFrameAlt(chapterTitle, name),
-    chapterId,
-    chapterNumber,
-    chapterTitle,
+    alt: frameAlt(item.chapterTitle, slug),
+    title,
+    chapterId: item.chapterId,
+    chapterNumber: item.chapterNumber,
+    chapterTitle: item.chapterTitle,
+    chapterDescription: item.chapterDescription,
   };
 }
 
 async function resolveChapters(): Promise<ResolvedChapter[]> {
   return Promise.all(
-    chapters.map(async (chapter) => ({
-      id: chapter.id,
-      number: chapter.number,
-      title: chapter.title,
-      description: chapter.description,
-      featured: await createFrame(
-        chapter.id,
-        chapter.number,
-        chapter.title,
-        chapter.featured,
-      ),
-      images: await Promise.all(
-        chapter.images.map((name) =>
-          createFrame(chapter.id, chapter.number, chapter.title, name),
-        ),
-      ),
-    })),
+    chapters.map(async (chapter) => {
+      return {
+        id: chapter.id,
+        number: chapter.number,
+        title: chapter.title,
+        description: chapter.description,
+        featured: await resolveFrame(chapter.featured),
+        images: await Promise.all(chapter.images.map((slug) => resolveFrame(slug))),
+      };
+    }),
   );
 }
 
 async function resolveAllFrames(): Promise<ResolvedFrame[]> {
+  return Promise.all(allFrames.map((item) => resolveFrame(item.slug)));
+}
+
+async function resolveFeaturedFrames(): Promise<ResolvedFeaturedFrame[]> {
   return Promise.all(
-    allFrames.map(async (frame) => {
-      const chapter = chapterLookup.get(frame.chapterId);
+    featuredItems.map(async (item) => {
+      const asset = await getAssetData(item.slug, "principais");
+      const title = formatTitleFromSlug(item.slug);
 
-      if (!chapter) {
-        throw new Error(`Chapter nao encontrado para ${frame.chapterId}`);
-      }
-
-      return createFrame(chapter.id, chapter.number, chapter.title, frame.name);
+      return {
+        key: `featured:${item.slug}`,
+        slug: item.slug,
+        src: asset.src,
+        blurDataURL: asset.blurDataURL,
+        alt: `Featured Series - ${title}`,
+        title,
+      };
     }),
   );
 }
 
 async function resolvePreviewStrip(): Promise<PreviewImage[]> {
-  const names = [
+  const previewSlugs = [
     "retrato_vermelho_dramatico",
     "capacete_vermelho_hero",
     "retrato_conceitual_fatiado_face_slice",
   ];
 
   return Promise.all(
-    names.map(async (name) => {
-      const asset = await getAssetData(name, "principais");
+    previewSlugs.map(async (slug) => {
+      const asset = await getAssetData(slug, "principais");
 
       return {
-        name,
+        slug,
+        name: slug,
         src: asset.src,
         blurDataURL: asset.blurDataURL,
-        alt: `Preview - ${formatAssetName(name)}`,
+        alt: `Preview - ${formatTitleFromSlug(slug)}`,
       };
     }),
   );
 }
 
 async function resolveHeroImage(): Promise<HeroImage> {
-  const heroName = "retrato_azul_cinematografico";
-  const asset = await getAssetData(heroName, "principais");
+  const heroSlug = "retrato_azul_cinematografico";
+  const asset = await getAssetData(heroSlug, "principais");
 
   return {
+    slug: heroSlug,
     src: asset.src,
     blurDataURL: asset.blurDataURL,
-    alt: `Hero - ${formatAssetName(heroName)}`,
+    alt: `Hero - ${formatTitleFromSlug(heroSlug)}`,
   };
 }
 
 export default async function Home() {
-  const [heroImage, previewStrip, resolvedChapters, resolvedAllFrames] =
+  const [heroImage, previewStrip, resolvedChapters, resolvedAllFrames, featuredFrames] =
     await Promise.all([
       resolveHeroImage(),
       resolvePreviewStrip(),
       resolveChapters(),
       resolveAllFrames(),
+      resolveFeaturedFrames(),
     ]);
 
   return (
-    <GalleryShell
-      heroImage={heroImage}
-      previewStrip={previewStrip}
-      chapters={resolvedChapters}
-      allFrames={resolvedAllFrames}
-    />
+    <Suspense fallback={null}>
+      <GalleryShell
+        heroImage={heroImage}
+        previewStrip={previewStrip}
+        chapters={resolvedChapters}
+        allFrames={resolvedAllFrames}
+        featuredFrames={featuredFrames}
+      />
+    </Suspense>
   );
 }

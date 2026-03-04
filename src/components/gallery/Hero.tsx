@@ -8,9 +8,10 @@ import type { HeroImage } from "./types";
 type HeroProps = {
   heroImage: HeroImage;
   frameCount: number;
+  onOpenViewer: (slug: string, trigger?: HTMLElement | null) => void;
 };
 
-export default function Hero({ heroImage, frameCount }: HeroProps) {
+export default function Hero({ heroImage, frameCount, onOpenViewer }: HeroProps) {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -85,9 +86,15 @@ export default function Hero({ heroImage, frameCount }: HeroProps) {
         sizes="100vw"
         className="object-cover"
       />
+      <button
+        type="button"
+        onClick={(event) => onOpenViewer(heroImage.slug, event.currentTarget)}
+        aria-label={`Abrir imagem ${heroImage.alt}`}
+        className="absolute inset-0 z-[1] focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white"
+      />
 
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/40" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent to-black/40" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
 
       <div className="relative z-10 w-full px-6 md:px-10">
         <div className="mx-auto grid w-full max-w-[1200px] grid-cols-1 gap-10 md:grid-cols-[1fr_auto] md:items-end">
