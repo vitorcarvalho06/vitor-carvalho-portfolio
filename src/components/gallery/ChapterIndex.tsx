@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import type { PreviewImage, ResolvedChapter } from "./types";
 
@@ -12,6 +12,14 @@ type ChapterIndexProps = {
   onOpenViewer: (slug: string, trigger?: HTMLElement | null) => void;
 };
 
+function getFocusableElements(container: HTMLElement): HTMLElement[] {
+  return Array.from(
+    container.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+    ),
+  ).filter((element) => !element.hasAttribute("disabled"));
+}
+
 export default function ChapterIndex({
   chapters,
   previews,
@@ -19,6 +27,25 @@ export default function ChapterIndex({
   onOpenViewer,
 }: ChapterIndexProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const drawerRef = useRef<HTMLElement | null>(null);
+  const drawerTriggerRef = useRef<HTMLElement | null>(null);
+
+  const closeDrawer = useCallback((restoreFocus = true) => {
+    setIsDrawerOpen(false);
+
+    if (!restoreFocus) {
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      drawerTriggerRef.current?.focus();
+    });
+  }, []);
+
+  const openDrawer = useCallback((trigger: HTMLElement) => {
+    drawerTriggerRef.current = trigger;
+    setIsDrawerOpen(true);
+  }, []);
 
   useEffect(() => {
     if (!isDrawerOpen) {
@@ -36,7 +63,7 @@ export default function ChapterIndex({
   useEffect(() => {
     const closeDrawerOnDesktop = () => {
       if (window.innerWidth >= 768) {
-        setIsDrawerOpen(false);
+        closeDrawer(false);
       }
     };
 
@@ -46,7 +73,54 @@ export default function ChapterIndex({
     return () => {
       window.removeEventListener("resize", closeDrawerOnDesktop);
     };
-  }, []);
+  }, [closeDrawer]);
+
+  useEffect(() => {
+    if (!isDrawerOpen || !drawerRef.current) {
+      return;
+    }
+
+    const drawer = drawerRef.current;
+    const firstLink = drawer.querySelector<HTMLElement>("a[href]");
+    firstLink?.focus();
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeDrawer();
+        return;
+      }
+
+      if (event.key !== "Tab") {
+        return;
+      }
+
+      const focusableElements = getFocusableElements(drawer);
+
+      if (!focusableElements.length) {
+        event.preventDefault();
+        return;
+      }
+
+      const first = focusableElements[0];
+      const last = focusableElements[focusableElements.length - 1];
+      const activeElement = document.activeElement as HTMLElement | null;
+
+      if (event.shiftKey && activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [isDrawerOpen, closeDrawer]);
 
   return (
     <>
@@ -63,7 +137,7 @@ export default function ChapterIndex({
             <div className="md:hidden">
               <button
                 type="button"
-                onClick={() => setIsDrawerOpen(true)}
+                onClick={(event) => openDrawer(event.currentTarget)}
                 className="border border-white/20 px-4 py-2 text-[11px] uppercase tracking-[0.24em] text-[#f5f5f5] transition hover:border-white/50 hover:bg-white/5 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white"
                 aria-label="Abrir lista de chapters"
                 aria-expanded={isDrawerOpen}
@@ -135,7 +209,7 @@ export default function ChapterIndex({
       <div className="fixed bottom-10 left-6 z-30 md:hidden">
         <button
           type="button"
-          onClick={() => setIsDrawerOpen(true)}
+          onClick={(event) => openDrawer(event.currentTarget)}
           className="border border-white/20 bg-[#0a0a0a]/80 px-4 py-2 text-[11px] uppercase tracking-[0.24em] text-[#f5f5f5] backdrop-blur-sm transition hover:border-white/50 hover:bg-[#0a0a0a] focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white"
           aria-label="Abrir chapters"
           aria-expanded={isDrawerOpen}
@@ -156,11 +230,12 @@ export default function ChapterIndex({
             "absolute inset-0 bg-black/70 transition-opacity duration-300",
             isDrawerOpen ? "opacity-100" : "opacity-0",
           )}
-          onClick={() => setIsDrawerOpen(false)}
+          onClick={() => closeDrawer()}
           aria-hidden
         />
 
         <aside
+          ref={drawerRef}
           id="chapters-drawer"
           className={cn(
             "absolute inset-y-0 right-0 w-[82%] max-w-sm border-l border-white/10 bg-[#0a0a0a] p-6 transition-transform duration-300",
@@ -176,7 +251,7 @@ export default function ChapterIndex({
             </p>
             <button
               type="button"
-              onClick={() => setIsDrawerOpen(false)}
+              onClick={() => closeDrawer()}
               className="border border-white/20 px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] text-[#f5f5f5] transition hover:border-white/50 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white"
               aria-label="Fechar chapters"
             >
@@ -192,7 +267,7 @@ export default function ChapterIndex({
                 <li key={chapter.id}>
                   <a
                     href={`#${chapter.id}`}
-                    onClick={() => setIsDrawerOpen(false)}
+                    onClick={() => closeDrawer(true)}
                     className={cn(
                       "inline-flex items-center gap-3 text-[13px] uppercase tracking-[0.2em] text-[#9ca3af] transition focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white",
                       active && "text-[#f5f5f5]",

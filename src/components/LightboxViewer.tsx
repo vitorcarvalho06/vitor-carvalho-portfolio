@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useMemo, useRef, type PointerEvent, type WheelEvent } from "react";
 import { getPrevNext } from "@/lib/gallery";
@@ -38,6 +38,7 @@ export default function LightboxViewer({
   const swipeStartX = useRef<number | null>(null);
   const swipeStartY = useRef<number | null>(null);
   const lastWheelAt = useRef(0);
+  const shouldReduceMotion = useReducedMotion();
 
   const isOpen = viewerState !== null;
   const currentItems = viewerState?.mode === "featured" ? featuredItems : frameItems;
@@ -169,15 +170,20 @@ export default function LightboxViewer({
     if (!isOpen) {
       return;
     }
-
-    event.preventDefault();
-
-    const now = Date.now();
-
-    if (now - lastWheelAt.current < 320) {
+    if (event.shiftKey) {
+      return;
+    }
+    if (Math.abs(event.deltaY) < 30) {
       return;
     }
 
+    const now = Date.now();
+
+    if (now - lastWheelAt.current < 220) {
+      return;
+    }
+
+    event.preventDefault();
     lastWheelAt.current = now;
 
     if (event.deltaY > 0) {
@@ -219,9 +225,12 @@ export default function LightboxViewer({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.28, ease: "easeOut" }}
+          transition={
+            shouldReduceMotion
+              ? { duration: 0.1 }
+              : { duration: 0.28, ease: "easeOut" }
+          }
           onClick={onClose}
-          onWheel={onWheelNavigate}
         >
           <motion.div
             ref={dialogRef}
@@ -229,16 +238,21 @@ export default function LightboxViewer({
             aria-modal="true"
             aria-label="Lightbox viewer"
             className="mx-auto flex h-full w-full max-w-[1800px] flex-col md:flex-row"
-            initial={{ opacity: 0, scale: 0.985 }}
+            initial={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.985 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.985 }}
-            transition={{ duration: 0.34, ease: "easeOut" }}
+            exit={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.985 }}
+            transition={
+              shouldReduceMotion
+                ? { duration: 0.1 }
+                : { duration: 0.34, ease: "easeOut" }
+            }
             onClick={(event) => event.stopPropagation()}
           >
             <div
               className="relative flex min-h-[56vh] flex-1 touch-none items-center justify-center px-4 py-16 md:min-h-0 md:px-12"
               onPointerDown={onPointerDown}
               onPointerUp={onPointerUp}
+              onWheel={onWheelNavigate}
               onPointerCancel={() => {
                 swipeStartX.current = null;
                 swipeStartY.current = null;
@@ -248,10 +262,14 @@ export default function LightboxViewer({
                 <motion.div
                   key={`${viewerState.mode}:${currentItem.slug}`}
                   className="relative h-[70vh] w-full max-w-[1320px] md:h-[84vh]"
-                  initial={{ opacity: 0, scale: 0.99 }}
+                  initial={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.99 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.99 }}
-                  transition={{ duration: 0.34, ease: "easeOut" }}
+                  exit={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.99 }}
+                  transition={
+                    shouldReduceMotion
+                      ? { duration: 0.1 }
+                      : { duration: 0.34, ease: "easeOut" }
+                  }
                 >
                   <Image
                     src={currentItem.src}
@@ -270,19 +288,19 @@ export default function LightboxViewer({
               <button
                 type="button"
                 onClick={() => onChangeIndex(prevIndex)}
-                className="absolute left-3 top-1/2 -translate-y-1/2 border border-white/10 bg-black/30 px-3 py-4 text-xs uppercase tracking-[0.28em] text-[#f5f5f5] transition hover:border-white/35 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-white md:left-6"
+                className="absolute left-3 top-1/2 -translate-y-1/2 border border-white/10 bg-black/30 px-4 py-3 text-2xl leading-none text-[#f5f5f5] transition hover:border-white/35 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-white md:left-6"
                 aria-label="Frame anterior"
               >
-                Prev
+                ←
               </button>
 
               <button
                 type="button"
                 onClick={() => onChangeIndex(nextIndex)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 border border-white/10 bg-black/30 px-3 py-4 text-xs uppercase tracking-[0.28em] text-[#f5f5f5] transition hover:border-white/35 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-white md:right-6"
-                aria-label="Proximo frame"
+                className="absolute right-3 top-1/2 -translate-y-1/2 border border-white/10 bg-black/30 px-4 py-3 text-2xl leading-none text-[#f5f5f5] transition hover:border-white/35 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-white md:right-6"
+                aria-label="Próximo frame"
               >
-                Next
+                →
               </button>
             </div>
 
@@ -308,6 +326,9 @@ export default function LightboxViewer({
                 <h3 className="text-2xl font-semibold leading-tight tracking-[-0.02em] text-[#f5f5f5]">
                   {currentItem.title}
                 </h3>
+                <p className="text-[10px] uppercase tracking-[0.22em] text-[#9ca3af]/60">
+                  {currentItem.slug}
+                </p>
                 <p className="max-w-[36ch] text-sm leading-relaxed tracking-[0.05em] text-[#9ca3af]">
                   {description}
                 </p>

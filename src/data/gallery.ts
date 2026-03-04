@@ -51,7 +51,7 @@ export const chapters: Chapter[] = [
     title: "Tension",
     description: "Drama suspended between seduction, danger, and ritual gestures.",
     featured: "vampiro_igreja",
-    images: ["boca_infinita_vermelho", "modelo_cadeira_vermelha"],
+    images: ["modelo_cadeira_vermelha", "boca_infinita_vermelho"],
   },
   {
     id: "architecture",

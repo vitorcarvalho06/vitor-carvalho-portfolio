@@ -128,7 +128,7 @@ export const chapterItems: ChapterItem[] = [
       "Drama suspended between seduction, danger, and ritual gestures.",
   },
   {
-    slug: "boca_infinita_vermelho",
+    slug: "modelo_cadeira_vermelha",
     chapterId: "tension",
     chapterNumber: "05",
     chapterTitle: "Tension",
@@ -136,7 +136,7 @@ export const chapterItems: ChapterItem[] = [
       "Drama suspended between seduction, danger, and ritual gestures.",
   },
   {
-    slug: "modelo_cadeira_vermelha",
+    slug: "boca_infinita_vermelho",
     chapterId: "tension",
     chapterNumber: "05",
     chapterTitle: "Tension",

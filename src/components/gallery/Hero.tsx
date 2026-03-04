@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { INSTAGRAM_URL, PORTFOLIO_PDF_PATH } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import type { HeroImage } from "./types";
 
@@ -66,7 +67,9 @@ export default function Hero({ heroImage, frameCount, onOpenViewer }: HeroProps)
             </a>
           </nav>
           <a
-            href="#"
+            href={INSTAGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             className="border border-white/20 px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] text-[#f5f5f5] transition hover:border-white/45 hover:text-[#f5f5f5] focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white"
             aria-label="Abrir Instagram"
           >
@@ -120,7 +123,9 @@ export default function Hero({ heroImage, frameCount, onOpenViewer }: HeroProps)
                 Enter Gallery
               </a>
               <a
-                href="#"
+                href={PORTFOLIO_PDF_PATH}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-xs uppercase tracking-[0.2em] text-[#9ca3af] transition hover:text-[#f5f5f5] focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white"
               >
                 Download PDF

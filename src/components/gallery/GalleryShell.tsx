@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import LightboxViewer from "@/components/LightboxViewer";
 import { getFeaturedIndexBySlug, getFrameIndexBySlug } from "@/lib/gallery";
+import { BOOKING_MAILTO, INSTAGRAM_URL } from "@/lib/site";
 import ChapterIndex from "./ChapterIndex";
 import ChapterSection from "./ChapterSection";
 import Hero from "./Hero";
@@ -304,18 +305,20 @@ export default function GalleryShell({
                 &amp; Collaborations
               </h2>
               <p className="mt-6 text-xs uppercase tracking-[0.18em] text-[#9ca3af]">
-                Sao Paulo - Available for commissioned work
+                São Paulo · Available for commissioned work
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3">
                 <a
-                  href="#"
+                  href={BOOKING_MAILTO}
                   className="border border-white/30 bg-[#f5f5f5] px-5 py-2.5 text-[11px] uppercase tracking-[0.24em] text-[#0a0a0a] transition hover:border-white hover:bg-white focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white"
                 >
                   Request booking
                 </a>
                 <a
-                  href="#"
+                  href={INSTAGRAM_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="border border-white/20 px-5 py-2.5 text-[11px] uppercase tracking-[0.24em] text-[#9ca3af] transition hover:border-white/45 hover:text-[#f5f5f5] focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white"
                 >
                   Instagram

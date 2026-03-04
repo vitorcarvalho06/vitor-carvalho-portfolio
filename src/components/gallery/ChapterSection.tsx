@@ -67,7 +67,15 @@ export default function ChapterSection({
               placeholder="blur"
               blurDataURL={chapter.featured.blurDataURL}
               sizes="(max-width: 1024px) 100vw, 92vw"
-              className="object-cover transition duration-700 ease-out group-hover:scale-[1.02] group-hover:brightness-110"
+              className={cn(
+                "object-cover transition duration-700 ease-out group-hover:scale-[1.02] group-hover:brightness-110",
+                chapter.featured.slug === "mulher_vestido_preto_sofa" &&
+                  "object-[50%_18%]",
+                chapter.featured.slug === "homem_soco_camera" &&
+                  "object-[50%_30%]",
+                chapter.featured.slug === "modelo_led_azul" &&
+                  "object-[50%_20%]",
+              )}
             />
           </div>
         </button>
@@ -111,7 +119,15 @@ export default function ChapterSection({
                   placeholder="blur"
                   blurDataURL={image.blurDataURL}
                   sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 42vw"
-                  className="object-cover transition duration-700 ease-out group-hover:scale-[1.02] group-hover:brightness-110"
+                  className={cn(
+                    "object-cover transition duration-700 ease-out group-hover:scale-[1.02] group-hover:brightness-110",
+                    image.slug === "retrato_ruiva_maquiagem_azul" &&
+                      "object-[50%_58%]",
+                    image.slug === "retrato_gotico_azul_flores" &&
+                      "object-[50%_5%]",
+                    image.slug === "mulher_camiseta_branca_low_light" &&
+                      "object-[50%_10%]",
+                  )}
                 />
               </div>
             </button>
@@ -126,4 +142,3 @@ export default function ChapterSection({
     </section>
   );
 }
-
