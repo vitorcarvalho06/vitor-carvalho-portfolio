@@ -1,76 +1,126 @@
 import GalleryShell from "@/components/gallery/GalleryShell";
-import type { PreviewImage, ResolvedChapter, ResolvedFrame } from "@/components/gallery/types";
+import type {
+  HeroImage,
+  PreviewImage,
+  ResolvedChapter,
+  ResolvedFrame,
+} from "@/components/gallery/types";
 import { allFrames, chapters } from "@/data/gallery";
-import { getAssetPath } from "@/lib/assets";
+import { getAssetData } from "@/lib/assets";
 
 const chapterLookup = new Map(chapters.map((chapter) => [chapter.id, chapter]));
 
-function createFrame(
+function formatAssetName(name: string): string {
+  return name.replaceAll("_", " ");
+}
+
+function formatFrameAlt(chapterTitle: string, name: string): string {
+  return `${chapterTitle} - ${formatAssetName(name)}`;
+}
+
+async function createFrame(
   chapterId: string,
   chapterNumber: string,
   chapterTitle: string,
   name: string,
-): ResolvedFrame {
+): Promise<ResolvedFrame> {
+  const asset = await getAssetData(name, "outras");
+
   return {
     key: `${chapterId}:${name}`,
     name,
-    src: getAssetPath(name, "outras"),
+    src: asset.src,
+    blurDataURL: asset.blurDataURL,
+    alt: formatFrameAlt(chapterTitle, name),
     chapterId,
     chapterNumber,
     chapterTitle,
   };
 }
 
-function resolveChapters(): ResolvedChapter[] {
-  return chapters.map((chapter) => ({
-    id: chapter.id,
-    number: chapter.number,
-    title: chapter.title,
-    description: chapter.description,
-    featured: createFrame(
-      chapter.id,
-      chapter.number,
-      chapter.title,
-      chapter.featured,
-    ),
-    images: chapter.images.map((name) =>
-      createFrame(chapter.id, chapter.number, chapter.title, name),
-    ),
-  }));
+async function resolveChapters(): Promise<ResolvedChapter[]> {
+  return Promise.all(
+    chapters.map(async (chapter) => ({
+      id: chapter.id,
+      number: chapter.number,
+      title: chapter.title,
+      description: chapter.description,
+      featured: await createFrame(
+        chapter.id,
+        chapter.number,
+        chapter.title,
+        chapter.featured,
+      ),
+      images: await Promise.all(
+        chapter.images.map((name) =>
+          createFrame(chapter.id, chapter.number, chapter.title, name),
+        ),
+      ),
+    })),
+  );
 }
 
-function resolveAllFrames(): ResolvedFrame[] {
-  return allFrames.map((frame) => {
-    const chapter = chapterLookup.get(frame.chapterId);
+async function resolveAllFrames(): Promise<ResolvedFrame[]> {
+  return Promise.all(
+    allFrames.map(async (frame) => {
+      const chapter = chapterLookup.get(frame.chapterId);
 
-    if (!chapter) {
-      throw new Error(`Chapter não encontrado para ${frame.chapterId}`);
-    }
+      if (!chapter) {
+        throw new Error(`Chapter nao encontrado para ${frame.chapterId}`);
+      }
 
-    return createFrame(chapter.id, chapter.number, chapter.title, frame.name);
-  });
+      return createFrame(chapter.id, chapter.number, chapter.title, frame.name);
+    }),
+  );
 }
 
-function resolvePreviewStrip(): PreviewImage[] {
+async function resolvePreviewStrip(): Promise<PreviewImage[]> {
   const names = [
     "retrato_vermelho_dramatico",
     "capacete_vermelho_hero",
     "retrato_conceitual_fatiado_face_slice",
   ];
 
-  return names.map((name) => ({
-    name,
-    src: getAssetPath(name, "principais"),
-  }));
+  return Promise.all(
+    names.map(async (name) => {
+      const asset = await getAssetData(name, "principais");
+
+      return {
+        name,
+        src: asset.src,
+        blurDataURL: asset.blurDataURL,
+        alt: `Preview - ${formatAssetName(name)}`,
+      };
+    }),
+  );
 }
 
-export default function Home() {
+async function resolveHeroImage(): Promise<HeroImage> {
+  const heroName = "retrato_azul_cinematografico";
+  const asset = await getAssetData(heroName, "principais");
+
+  return {
+    src: asset.src,
+    blurDataURL: asset.blurDataURL,
+    alt: `Hero - ${formatAssetName(heroName)}`,
+  };
+}
+
+export default async function Home() {
+  const [heroImage, previewStrip, resolvedChapters, resolvedAllFrames] =
+    await Promise.all([
+      resolveHeroImage(),
+      resolvePreviewStrip(),
+      resolveChapters(),
+      resolveAllFrames(),
+    ]);
+
   return (
     <GalleryShell
-      heroSrc={getAssetPath("retrato_azul_cinematografico", "principais")}
-      previewStrip={resolvePreviewStrip()}
-      chapters={resolveChapters()}
-      allFrames={resolveAllFrames()}
+      heroImage={heroImage}
+      previewStrip={previewStrip}
+      chapters={resolvedChapters}
+      allFrames={resolvedAllFrames}
     />
   );
 }

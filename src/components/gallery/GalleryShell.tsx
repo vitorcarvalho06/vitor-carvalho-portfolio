@@ -5,17 +5,55 @@ import ChapterIndex from "./ChapterIndex";
 import ChapterSection from "./ChapterSection";
 import Hero from "./Hero";
 import Lightbox from "./Lightbox";
-import type { PreviewImage, ResolvedChapter, ResolvedFrame } from "./types";
+import type {
+  HeroImage,
+  PreviewImage,
+  ResolvedChapter,
+  ResolvedFrame,
+} from "./types";
 
 type GalleryShellProps = {
-  heroSrc: string;
+  heroImage: HeroImage;
   previewStrip: PreviewImage[];
   chapters: ResolvedChapter[];
   allFrames: ResolvedFrame[];
 };
 
+function parseFrameLabel(value: string | null, total: number): number | null {
+  if (!value) {
+    return null;
+  }
+
+  const parsed = Number.parseInt(value, 10);
+
+  if (Number.isNaN(parsed) || parsed < 1 || parsed > total) {
+    return null;
+  }
+
+  return parsed - 1;
+}
+
+function getFrameIndexFromLocation(total: number): number | null {
+  const queryFrame = parseFrameLabel(
+    new URL(window.location.href).searchParams.get("frame"),
+    total,
+  );
+
+  if (queryFrame !== null) {
+    return queryFrame;
+  }
+
+  const hashMatch = window.location.hash.match(/^#frame-(\d{1,2})$/i);
+
+  if (!hashMatch) {
+    return null;
+  }
+
+  return parseFrameLabel(hashMatch[1], total);
+}
+
 export default function GalleryShell({
-  heroSrc,
+  heroImage,
   previewStrip,
   chapters,
   allFrames,
@@ -127,7 +165,50 @@ export default function GalleryShell({
     };
   }, [frameIndexMap]);
 
+  useEffect(() => {
+    const syncFromLocation = () => {
+      const index = getFrameIndexFromLocation(allFrames.length);
+      setLightboxIndex(index);
+    };
+
+    syncFromLocation();
+    window.addEventListener("hashchange", syncFromLocation);
+    window.addEventListener("popstate", syncFromLocation);
+
+    return () => {
+      window.removeEventListener("hashchange", syncFromLocation);
+      window.removeEventListener("popstate", syncFromLocation);
+    };
+  }, [allFrames.length]);
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const frameHashPattern = /^#frame-\d{1,2}$/i;
+
+    if (lightboxIndex === null) {
+      url.searchParams.delete("frame");
+
+      if (frameHashPattern.test(url.hash)) {
+        url.hash = "";
+      }
+    } else {
+      const label = String(lightboxIndex + 1).padStart(2, "0");
+      url.searchParams.set("frame", label);
+      url.hash = `frame-${label}`;
+    }
+
+    window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+  }, [lightboxIndex]);
+
   const currentFrame = lightboxIndex !== null ? allFrames[lightboxIndex] : null;
+  const previousFrameSrc =
+    lightboxIndex !== null
+      ? allFrames[(lightboxIndex - 1 + allFrames.length) % allFrames.length]?.src
+      : null;
+  const nextFrameSrc =
+    lightboxIndex !== null
+      ? allFrames[(lightboxIndex + 1) % allFrames.length]?.src
+      : null;
 
   const openLightbox = (frame: ResolvedFrame) => {
     const index = frameIndexMap.get(frame.key);
@@ -165,7 +246,7 @@ export default function GalleryShell({
 
   return (
     <div className="bg-[#0a0a0a] text-[#f5f5f5]">
-      <Hero heroSrc={heroSrc} frameCount={allFrames.length} />
+      <Hero heroImage={heroImage} frameCount={allFrames.length} />
 
       <main id="gallery">
         <ChapterIndex
@@ -187,26 +268,34 @@ export default function GalleryShell({
           id="contact"
           className="scroll-mt-28 border-t border-white/10 py-20 md:py-28"
         >
-          <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-8 px-6 md:px-10">
-            <h2 className="text-3xl font-semibold tracking-[-0.02em] text-[#f5f5f5] md:text-5xl">
-              Contact
-            </h2>
-            <p className="text-sm uppercase tracking-[0.16em] text-[#9ca3af]">
-              Bookings &amp; collaborations
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <a
-                href="#"
-                className="border border-white/20 px-5 py-2.5 text-[11px] uppercase tracking-[0.24em] text-[#f5f5f5] transition hover:border-white/50 hover:text-[#f5f5f5] focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white"
-              >
-                Email
-              </a>
-              <a
-                href="#"
-                className="border border-white/20 px-5 py-2.5 text-[11px] uppercase tracking-[0.24em] text-[#f5f5f5] transition hover:border-white/50 hover:text-[#f5f5f5] focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white"
-              >
-                Instagram
-              </a>
+          <div className="mx-auto w-full max-w-[1200px] px-6 md:px-10">
+            <div className="border border-white/10 bg-white/[0.02] px-6 py-8 md:px-10 md:py-10">
+              <p className="text-[10px] uppercase tracking-[0.34em] text-[#9ca3af]">
+                Contact
+              </p>
+              <h2 className="mt-4 text-[clamp(34px,4.2vw,64px)] font-semibold leading-[0.94] tracking-[-0.02em] text-[#f5f5f5]">
+                Bookings
+                <br />
+                &amp; Collaborations
+              </h2>
+              <p className="mt-6 text-xs uppercase tracking-[0.18em] text-[#9ca3af]">
+                Sao Paulo - Available for commissioned work
+              </p>
+
+              <div className="mt-8 flex flex-wrap gap-3">
+                <a
+                  href="#"
+                  className="border border-white/30 bg-[#f5f5f5] px-5 py-2.5 text-[11px] uppercase tracking-[0.24em] text-[#0a0a0a] transition hover:border-white hover:bg-white focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white"
+                >
+                  Request booking
+                </a>
+                <a
+                  href="#"
+                  className="border border-white/20 px-5 py-2.5 text-[11px] uppercase tracking-[0.24em] text-[#9ca3af] transition hover:border-white/45 hover:text-[#f5f5f5] focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white"
+                >
+                  Instagram
+                </a>
+              </div>
             </div>
           </div>
         </section>
@@ -217,6 +306,8 @@ export default function GalleryShell({
         frame={currentFrame}
         currentIndex={lightboxIndex ?? 0}
         total={allFrames.length}
+        previousSrc={previousFrameSrc}
+        nextSrc={nextFrameSrc}
         onClose={closeLightbox}
         onNext={nextFrame}
         onPrev={previousFrame}

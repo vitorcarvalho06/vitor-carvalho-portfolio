@@ -3,13 +3,14 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import type { HeroImage } from "./types";
 
 type HeroProps = {
-  heroSrc: string;
+  heroImage: HeroImage;
   frameCount: number;
 };
 
-export default function Hero({ heroSrc, frameCount }: HeroProps) {
+export default function Hero({ heroImage, frameCount }: HeroProps) {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -74,10 +75,13 @@ export default function Hero({ heroSrc, frameCount }: HeroProps) {
       </header>
 
       <Image
-        src={heroSrc}
-        alt="Hero cinematografico do portfolio"
+        src={heroImage.src}
+        alt={heroImage.alt}
         fill
         priority
+        quality={80}
+        placeholder="blur"
+        blurDataURL={heroImage.blurDataURL}
         sizes="100vw"
         className="object-cover"
       />
