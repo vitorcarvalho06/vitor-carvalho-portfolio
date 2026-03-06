@@ -8,13 +8,16 @@ export type AssetData = {
   blurDataURL: string;
 };
 
-const EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp"] as const;
+const EXTENSIONS = [".avif", ".webp", ".jpg", ".jpeg", ".png"] as const;
 const ASSET_ROOT = path.join(process.cwd(), "public", "assets");
 const FALLBACK_BLUR_DATA_URL =
   "data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=";
 const assetDataCache = new Map<string, Promise<AssetData>>();
 
-function resolveAssetFile(name: string, group: AssetGroup): {
+function resolveAssetFile(
+  name: string,
+  group: AssetGroup,
+): {
   absolutePath: string;
   publicPath: string;
 } {
