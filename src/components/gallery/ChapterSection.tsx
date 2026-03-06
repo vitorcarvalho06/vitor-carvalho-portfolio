@@ -20,14 +20,14 @@ export default function ChapterSection({
     <section
       id={chapter.id}
       data-chapter-section
-      className="mt-[240px] scroll-mt-32 border-t border-white/10 py-24 first:mt-[180px] md:mt-[260px] md:py-32"
+      className="mt-[180px] scroll-mt-32 border-t border-white/10 py-20 first:mt-[140px] md:mt-[220px] md:py-28 [content-visibility:auto] [contain-intrinsic-size:1px_1400px]"
     >
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.25 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="mx-auto mb-24 max-w-[1200px] px-6 md:mb-28 md:px-10"
+        className="mx-auto mb-16 max-w-[1200px] px-6 md:mb-20 md:px-10"
       >
         <p className="text-[10px] uppercase tracking-[0.38em] text-[#9ca3af]">
           CHAPTER {chapter.number}
@@ -45,7 +45,7 @@ export default function ChapterSection({
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.18 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="mx-auto mb-10 w-full max-w-[1400px] px-6 md:px-10"
+        className="mx-auto mb-8 w-full max-w-[1400px] px-6 md:mb-10 md:px-10"
       >
         <button
           type="button"
@@ -66,7 +66,7 @@ export default function ChapterSection({
               quality={80}
               placeholder="blur"
               blurDataURL={chapter.featured.blurDataURL}
-              sizes="(max-width: 1024px) 100vw, 92vw"
+              sizes="(max-width: 768px) 100vw, (max-width: 1280px) 92vw, 1400px"
               className={cn(
                 "object-cover transition duration-700 ease-out group-hover:scale-[1.02] group-hover:brightness-110",
                 chapter.featured.slug === "mulher_vestido_preto_sofa" &&
@@ -118,7 +118,7 @@ export default function ChapterSection({
                   quality={80}
                   placeholder="blur"
                   blurDataURL={image.blurDataURL}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 42vw"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 42vw"
                   className={cn(
                     "object-cover transition duration-700 ease-out group-hover:scale-[1.02] group-hover:brightness-110",
                     image.slug === "retrato_ruiva_maquiagem_azul" &&

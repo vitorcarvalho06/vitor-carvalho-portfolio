@@ -12,15 +12,29 @@ type HeroProps = {
   onOpenViewer: (slug: string, trigger?: HTMLElement | null) => void;
 };
 
-export default function Hero({ heroImage, frameCount, onOpenViewer }: HeroProps) {
+export default function Hero({
+  heroImage,
+  frameCount,
+  onOpenViewer,
+}: HeroProps) {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => {
+    let ticking = false;
+
+    const updateHeader = () => {
       setIsScrolled(window.scrollY > 40);
+      ticking = false;
     };
 
-    onScroll();
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateHeader);
+        ticking = true;
+      }
+    };
+
+    updateHeader();
     window.addEventListener("scroll", onScroll, { passive: true });
 
     return () => {
@@ -29,13 +43,11 @@ export default function Hero({ heroImage, frameCount, onOpenViewer }: HeroProps)
   }, []);
 
   return (
-    <section className="relative flex h-screen items-end pb-[120px]">
+    <section className="relative flex min-h-[100svh] items-end pb-[96px] md:pb-[120px]">
       <header
         className={cn(
-          "fixed inset-x-0 top-0 z-40 transition-all duration-500",
-          isScrolled
-            ? "bg-black/60 backdrop-blur-[12px]"
-            : "bg-transparent",
+          "fixed inset-x-0 top-0 z-40 will-change-[background-color,backdrop-filter] transition-all duration-300",
+          isScrolled ? "bg-black/60 backdrop-blur-[12px]" : "bg-transparent",
         )}
       >
         <div className="mx-auto flex h-20 w-full max-w-[1200px] items-center justify-between px-6 md:px-10">
