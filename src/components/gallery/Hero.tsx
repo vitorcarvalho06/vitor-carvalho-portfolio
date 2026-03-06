@@ -147,13 +147,13 @@ export default function Hero({
         >
           <div className="mx-auto grid w-full max-w-[1320px] grid-cols-1 gap-14 md:grid-cols-[minmax(0,1fr)_220px] md:items-end">
             <div className="relative max-w-3xl">
-              <motion.p
+              {/* <motion.p
                 aria-hidden
                 className="pointer-events-none absolute -top-10 left-0 hidden select-none text-[clamp(92px,16vw,240px)] font-semibold uppercase leading-none tracking-[-0.06em] text-white/[0.045] md:block"
                 style={{ y: heroGhostY }}
               >
                 ATMOSPHERE
-              </motion.p>
+              </motion.p> */}
 
               <div className="relative z-10 max-w-[760px] space-y-5 md:space-y-6">
                 <p className="text-[10px] uppercase tracking-[0.42em] text-[#8ea4bf]">
