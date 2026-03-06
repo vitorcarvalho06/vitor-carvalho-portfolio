@@ -118,32 +118,50 @@ export default function GalleryShell({
       document.querySelectorAll<HTMLElement>("[data-chapter-section]"),
     );
 
-    if (!sections.length) {
-      return;
-    }
+    if (!sections.length) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visibleEntries = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+    const updateActiveChapter = () => {
+      const viewportOffset = 140;
 
-        if (!visibleEntries.length) {
-          return;
+      let closestSection: HTMLElement | null = null;
+      let closestDistance = Number.POSITIVE_INFINITY;
+
+      for (const section of sections) {
+        const rect = section.getBoundingClientRect();
+        const distance = Math.abs(rect.top - viewportOffset);
+
+        if (rect.bottom > viewportOffset && distance < closestDistance) {
+          closestDistance = distance;
+          closestSection = section;
         }
+      }
 
-        setActiveChapterId(visibleEntries[0].target.id);
-      },
-      {
-        rootMargin: "-35% 0px -45% 0px",
-        threshold: [0.15, 0.3, 0.45, 0.6],
-      },
-    );
+      if (closestSection?.id) {
+        setActiveChapterId(closestSection.id);
+      }
+    };
 
-    sections.forEach((section) => observer.observe(section));
+    updateActiveChapter();
+
+    let ticking = false;
+
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          updateActiveChapter();
+          ticking = false;
+        });
+
+        ticking = true;
+      }
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
 
     return () => {
-      observer.disconnect();
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
     };
   }, []);
 

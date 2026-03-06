@@ -28,8 +28,8 @@ export default function Hero({
     mass: 0.22,
   });
 
-  const heroImageY = useTransform(scrollY, [0, 700], [0, 72]);
-  const heroContentY = useTransform(scrollY, [0, 500], [0, -28]);
+  const heroImageY = useTransform(scrollY, [0, 700], [0, 40]);
+  const heroContentY = useTransform(scrollY, [0, 500], [0, -18]);
   const heroContentOpacity = useTransform(scrollY, [0, 260], [1, 0.82]);
   const heroGhostY = useTransform(scrollY, [0, 700], [0, 36]);
   useEffect(() => {
@@ -62,7 +62,7 @@ export default function Hero({
         className="fixed inset-x-0 top-0 z-[60] h-px origin-left bg-[rgba(142,164,191,0.85)]"
         style={{ scaleX: progressScaleX }}
       />
-      <section className="relative flex min-h-[100svh] items-end pb-[96px] md:pb-[120px]">
+      <section className="relative flex min-h-[100svh] items-end overflow-hidden pb-[96px] md:pb-[120px]">
         <header
           className={cn(
             "fixed inset-x-0 top-0 z-40 will-change-[background-color,backdrop-filter] transition-all duration-300",
