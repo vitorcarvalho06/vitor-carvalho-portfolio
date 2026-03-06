@@ -2,7 +2,13 @@
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
-import { useEffect, useMemo, useRef, type PointerEvent, type WheelEvent } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  type PointerEvent,
+  type WheelEvent,
+} from "react";
 import { getPrevNext } from "@/lib/gallery";
 import type {
   ResolvedFeaturedFrame,
@@ -41,7 +47,8 @@ export default function LightboxViewer({
   const shouldReduceMotion = useReducedMotion();
 
   const isOpen = viewerState !== null;
-  const currentItems = viewerState?.mode === "featured" ? featuredItems : frameItems;
+  const currentItems =
+    viewerState?.mode === "featured" ? featuredItems : frameItems;
   const currentIndex = viewerState?.index ?? 0;
   const currentItem = currentItems[currentIndex];
 
@@ -221,7 +228,7 @@ export default function LightboxViewer({
     <AnimatePresence>
       {isOpen ? (
         <motion.div
-          className="fixed inset-0 z-50 bg-[#070707]/95"
+          className="fixed inset-0 z-50 bg-[#050505]/[0.96] backdrop-blur-[6px]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -237,7 +244,7 @@ export default function LightboxViewer({
             role="dialog"
             aria-modal="true"
             aria-label="Lightbox viewer"
-            className="mx-auto flex h-full w-full max-w-[1800px] flex-col md:flex-row"
+            className="mx-auto flex h-full w-full max-w-[1920px] flex-col md:flex-row"
             initial={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.985 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.985 }}
@@ -249,7 +256,7 @@ export default function LightboxViewer({
             onClick={(event) => event.stopPropagation()}
           >
             <div
-              className="relative flex min-h-[56vh] flex-1 touch-none items-center justify-center px-4 py-16 md:min-h-0 md:px-12"
+              className="relative flex min-h-[58vh] flex-1 touch-none items-center justify-center px-4 py-16 md:min-h-0 md:px-10 lg:px-14"
               onPointerDown={onPointerDown}
               onPointerUp={onPointerUp}
               onWheel={onWheelNavigate}
@@ -258,13 +265,23 @@ export default function LightboxViewer({
                 swipeStartY.current = null;
               }}
             >
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.03),transparent_42%)]" />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(142,164,191,0.10),transparent_24%)]" />
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={`${viewerState.mode}:${currentItem.slug}`}
-                  className="relative h-[70vh] w-full max-w-[1320px] md:h-[84vh]"
-                  initial={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.99 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.99 }}
+                  className="relative h-[68vh] w-full max-w-[1380px] border border-[rgba(243,239,231,0.10)] bg-white/[0.02] md:h-[84vh]"
+                  initial={{
+                    opacity: 0,
+                    x: shouldReduceMotion ? 0 : 12,
+                    scale: shouldReduceMotion ? 1 : 0.992,
+                  }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{
+                    opacity: 0,
+                    x: shouldReduceMotion ? 0 : -12,
+                    scale: shouldReduceMotion ? 1 : 0.992,
+                  }}
                   transition={
                     shouldReduceMotion
                       ? { duration: 0.1 }
@@ -275,12 +292,12 @@ export default function LightboxViewer({
                     src={currentItem.src}
                     alt={currentItem.alt}
                     fill
-                    priority
+                    priority={currentIndex === 0}
                     quality={80}
                     placeholder="blur"
                     blurDataURL={currentItem.blurDataURL}
                     sizes="(max-width: 768px) 100vw, 78vw"
-                    className="object-contain"
+                    className="object-contain p-3 md:p-4"
                   />
                 </motion.div>
               </AnimatePresence>
@@ -288,7 +305,7 @@ export default function LightboxViewer({
               <button
                 type="button"
                 onClick={() => onChangeIndex(prevIndex)}
-                className="absolute left-3 top-1/2 -translate-y-1/2 border border-white/10 bg-black/30 px-4 py-3 text-2xl leading-none text-[#f5f5f5] transition hover:border-white/35 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-white md:left-6"
+                className="absolute left-3 top-1/2 -translate-y-1/2 border border-[rgba(243,239,231,0.10)] bg-[#050505]/60 px-4 py-3 text-xl leading-none text-[#f3efe7] backdrop-blur-md transition hover:border-[rgba(142,164,191,0.45)] hover:bg-[rgba(142,164,191,0.08)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-white md:left-6"
                 aria-label="Frame anterior"
               >
                 ←
@@ -297,41 +314,127 @@ export default function LightboxViewer({
               <button
                 type="button"
                 onClick={() => onChangeIndex(nextIndex)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 border border-white/10 bg-black/30 px-4 py-3 text-2xl leading-none text-[#f5f5f5] transition hover:border-white/35 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-white md:right-6"
+                className="absolute right-3 top-1/2 -translate-y-1/2 border border-[rgba(243,239,231,0.10)] bg-[#050505]/60 px-4 py-3 text-xl leading-none text-[#f3efe7] backdrop-blur-md transition hover:border-[rgba(142,164,191,0.45)] hover:bg-[rgba(142,164,191,0.08)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-white md:right-6"
                 aria-label="Próximo frame"
               >
                 →
               </button>
+              <div className="pointer-events-none absolute bottom-5 left-1/2 hidden -translate-x-1/2 border border-[rgba(243,239,231,0.10)] bg-[#050505]/55 px-4 py-2 text-[10px] uppercase tracking-[0.24em] text-[#a1a1aa] backdrop-blur-md md:block">
+                Swipe or scroll to navigate
+              </div>
             </div>
 
-            <aside className="w-full border-t border-white/10 px-6 py-6 md:w-[360px] md:border-l md:border-t-0 md:px-8 md:py-10">
+            <aside className="w-full border-t border-[rgba(243,239,231,0.10)] bg-white/[0.02] px-6 py-6 md:w-[400px] md:border-l md:border-t-0 md:px-8 md:py-8 lg:w-[420px]">
               <button
                 ref={closeButtonRef}
                 type="button"
                 onClick={onClose}
-                className="ml-auto block border border-white/15 px-3 py-1.5 text-[10px] uppercase tracking-[0.24em] text-[#f5f5f5] transition hover:border-white/35 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-white"
+                className="ml-auto block border border-[rgba(243,239,231,0.14)] bg-white/[0.03] px-3.5 py-1.5 text-[10px] uppercase tracking-[0.28em] text-[#f3efe7] transition hover:border-[rgba(142,164,191,0.45)] hover:bg-[rgba(142,164,191,0.08)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-white"
                 aria-label="Fechar viewer"
               >
                 Close
               </button>
 
-              <div className="mt-8 space-y-4">
-                <p className="text-[11px] uppercase tracking-[0.28em] text-[#f5f5f5]">
-                  {frameLabel}
-                </p>
-                <div className="h-px w-full bg-white/10" />
-                <p className="text-[11px] uppercase tracking-[0.22em] text-[#9ca3af]">
-                  {sectionLabel}
-                </p>
-                <h3 className="text-2xl font-semibold leading-tight tracking-[-0.02em] text-[#f5f5f5]">
-                  {currentItem.title}
-                </h3>
-                <p className="text-[10px] uppercase tracking-[0.22em] text-[#9ca3af]/60">
-                  {currentItem.slug}
-                </p>
-                <p className="max-w-[36ch] text-sm leading-relaxed tracking-[0.05em] text-[#9ca3af]">
-                  {description}
-                </p>
+              <div className="mt-8 space-y-6">
+                <div className="space-y-3">
+                  <p className="text-[10px] uppercase tracking-[0.34em] text-[#8ea4bf]">
+                    {frameLabel}
+                  </p>
+
+                  <div className="flex items-center gap-3">
+                    <div className="h-px flex-1 bg-[rgba(243,239,231,0.10)]" />
+                    <p className="text-[10px] uppercase tracking-[0.28em] text-[#6f7480]">
+                      Viewer
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <p className="text-[11px] uppercase tracking-[0.24em] text-[#a1a1aa]">
+                    {sectionLabel}
+                  </p>
+
+                  <h3 className="max-w-[12ch] text-[clamp(28px,3vw,42px)] font-semibold leading-[0.92] tracking-[-0.04em] text-[#f3efe7]">
+                    {currentItem.title}
+                  </h3>
+
+                  <p className="text-[10px] uppercase tracking-[0.22em] text-[#6f7480]">
+                    {currentItem.slug}
+                  </p>
+
+                  <p className="max-w-[34ch] text-sm leading-relaxed tracking-[0.07em] text-[#a1a1aa]">
+                    {description}
+                  </p>
+                </div>
+              </div>
+              <div className="mt-8 space-y-5 border-t border-[rgba(243,239,231,0.10)] pt-6">
+                <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.24em] text-[#a1a1aa]">
+                  <span>Navigate</span>
+                  <span className="text-[#6f7480]">← → keys</span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => onChangeIndex(prevIndex)}
+                    className="border border-[rgba(243,239,231,0.12)] bg-white/[0.03] px-4 py-3 text-left text-[10px] uppercase tracking-[0.24em] text-[#f3efe7] transition hover:border-[rgba(142,164,191,0.45)] hover:bg-[rgba(142,164,191,0.08)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-white"
+                  >
+                    Previous
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => onChangeIndex(nextIndex)}
+                    className="border border-[rgba(243,239,231,0.12)] bg-white/[0.03] px-4 py-3 text-left text-[10px] uppercase tracking-[0.24em] text-[#f3efe7] transition hover:border-[rgba(142,164,191,0.45)] hover:bg-[rgba(142,164,191,0.08)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-white"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+              <div className="mt-8 space-y-4 border-t border-[rgba(243,239,231,0.10)] pt-6">
+                <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.24em] text-[#a1a1aa]">
+                  <span>Sequence</span>
+                  <span className="text-[#6f7480]">
+                    {String(currentIndex + 1).padStart(2, "0")} /{" "}
+                    {String(currentItems.length).padStart(2, "0")}
+                  </span>
+                </div>
+
+                <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
+                  {currentItems.map((item, index) => {
+                    const isActive = index === currentIndex;
+
+                    return (
+                      <button
+                        key={item.slug}
+                        type="button"
+                        onClick={() => onChangeIndex(index)}
+                        aria-label={`Abrir ${item.title}`}
+                        className={`relative h-16 w-12 shrink-0 overflow-hidden border transition ${
+                          isActive
+                            ? "border-[rgba(142,164,191,0.55)]"
+                            : "border-[rgba(243,239,231,0.10)] hover:border-[rgba(243,239,231,0.26)]"
+                        }`}
+                      >
+                        <Image
+                          src={item.src}
+                          alt={item.alt}
+                          fill
+                          sizes="48px"
+                          className="object-cover"
+                        />
+                        <span
+                          className={`absolute inset-0 ${
+                            isActive
+                              ? "bg-[rgba(142,164,191,0.10)]"
+                              : "bg-black/20"
+                          }`}
+                          aria-hidden
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </aside>
           </motion.div>
