@@ -6,17 +6,22 @@ import { ReactNode } from "react";
 type FadeInProps = {
   children: ReactNode;
   delay?: number;
+  amount?: number;
 };
 
-export default function FadeIn({ children, delay = 0 }: FadeInProps) {
+export default function FadeIn({
+  children,
+  delay = 0,
+  amount = 0.25,
+}: FadeInProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.25 }}
+      initial={{ opacity: 0, y: 24, filter: "blur(10px)" }}
+      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      viewport={{ once: true, amount }}
       transition={{
-        duration: 0.8,
-        ease: "easeOut",
+        duration: 0.72,
+        ease: [0.22, 1, 0.36, 1],
         delay,
       }}
     >

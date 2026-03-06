@@ -1,5 +1,5 @@
 "use client";
-
+import { motion } from "framer-motion";
 import FadeIn from "@/components/ui/FadeIn";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
@@ -54,7 +54,7 @@ export default function ChapterSection({
         </div>
       </FadeIn>
 
-      <FadeIn delay={0.05}>
+      <FadeIn delay={0.05} amount={0.18}>
         <div className="mx-auto mb-10 w-full max-w-[1480px] px-6 md:mb-12 md:px-10">
           <button
             type="button"
@@ -65,7 +65,21 @@ export default function ChapterSection({
             className="group w-full text-left focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white"
             aria-label={`Abrir frame ${chapter.featured.name}`}
           >
-            <div className="noise-overlay relative aspect-[16/9] w-full overflow-hidden border border-[rgba(243,239,231,0.12)] bg-white/[0.02]">
+            <motion.div
+              initial={{
+                opacity: 0,
+                scale: 0.985,
+                clipPath: "inset(8% 0% 8% 0%)",
+              }}
+              whileInView={{
+                opacity: 1,
+                scale: 1,
+                clipPath: "inset(0% 0% 0% 0%)",
+              }}
+              viewport={{ once: true, amount: 0.18 }}
+              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+              className="noise-overlay relative aspect-[16/9] w-full overflow-hidden border border-[rgba(243,239,231,0.12)] bg-white/[0.02]"
+            >
               <Image
                 src={chapter.featured.src}
                 alt={chapter.featured.alt}
@@ -77,7 +91,7 @@ export default function ChapterSection({
                 blurDataURL={chapter.featured.blurDataURL}
                 sizes="(max-width: 768px) 100vw, (max-width: 1280px) 92vw, 1400px"
                 className={cn(
-                  "object-cover transition duration-700 ease-out group-hover:scale-[1.018] group-hover:brightness-110",
+                  "object-cover transition duration-700 ease-out group-hover:scale-[1.015] group-hover:brightness-110 group-hover:contrast-[1.03]",
                   chapter.featured.slug === "mulher_vestido_preto_sofa" &&
                     "object-[50%_18%]",
                   chapter.featured.slug === "homem_soco_camera" &&
@@ -86,7 +100,7 @@ export default function ChapterSection({
                     "object-[50%_20%]",
                 )}
               />
-            </div>
+            </motion.div>
           </button>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[rgba(243,239,231,0.08)] pt-4 text-[10px] uppercase tracking-[0.22em] text-[#a1a1aa]">
             <span className="text-[#8ea4bf]">Featured Frame</span>
@@ -96,7 +110,7 @@ export default function ChapterSection({
         </div>
       </FadeIn>
 
-      <FadeIn delay={0.1}>
+      <FadeIn delay={0.1} amount={0.12}>
         <div className="mx-auto grid max-w-[1480px] grid-cols-12 gap-7 px-6 md:px-10">
           <div
             className={cn(
@@ -105,9 +119,17 @@ export default function ChapterSection({
             )}
           >
             {chapter.images.map((image, index) => (
-              <button
+              <motion.button
                 key={image.key}
                 type="button"
+                initial={{ opacity: 0, y: 18, filter: "blur(8px)" }}
+                whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                viewport={{ once: true, amount: 0.12 }}
+                transition={{
+                  duration: 0.65,
+                  delay: index * 0.06,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
                 onClick={(event) =>
                   onOpenViewer(image.slug, event.currentTarget)
                 }
@@ -132,7 +154,7 @@ export default function ChapterSection({
                     blurDataURL={image.blurDataURL}
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 42vw"
                     className={cn(
-                      "object-cover transition duration-700 ease-out group-hover:scale-[1.02] group-hover:brightness-110",
+                      "object-cover transition duration-700 ease-out group-hover:scale-[1.018] group-hover:brightness-110 group-hover:contrast-[1.04]",
                       image.slug === "retrato_ruiva_maquiagem_azul" &&
                         "object-[50%_58%]",
                       image.slug === "retrato_gotico_azul_flores" &&
@@ -142,7 +164,7 @@ export default function ChapterSection({
                     )}
                   />
                 </div>
-              </button>
+              </motion.button>
             ))}
           </div>
 
