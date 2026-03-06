@@ -121,7 +121,7 @@ export default function GalleryShell({
     if (!sections.length) return;
 
     const updateActiveChapter = () => {
-      const viewportOffset = 140;
+      const viewportOffset = 1;
 
       let closestSection: HTMLElement | null = null;
       let closestDistance = Number.POSITIVE_INFINITY;
@@ -328,17 +328,17 @@ export default function GalleryShell({
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(142,164,191,0.14),transparent_24%)]" />
 
               <div className="relative z-10 grid gap-12 md:grid-cols-[minmax(0,1fr)_320px] md:items-end">
-                <div className="max-w-3xl">
-                  <p className="text-[10px] uppercase tracking-[0.34em] text-[#8ea4bf]">
+                <div className="max-w-[760px]">
+                  <p className="text-[10px] uppercase tracking-[0.42em] text-[#8ea4bf]">
                     Contact
                   </p>
 
-                  <h2 className="mt-5 max-w-[12ch] text-[clamp(38px,5vw,80px)] font-semibold leading-[0.9] tracking-[-0.045em] text-[#f3efe7]">
+                  <h2 className="mt-5 max-w-[11ch] text-[clamp(38px,4.8vw,76px)] font-semibold leading-[0.88] tracking-[-0.05em] text-[#f3efe7]">
                     Available for selected commissions and visual
                     collaborations.
                   </h2>
 
-                  <p className="mt-6 max-w-[58ch] text-sm leading-relaxed tracking-[0.08em] text-[#a1a1aa]">
+                  <p className="mt-6 max-w-[50ch] text-[14px] leading-[1.85] tracking-[0.06em] text-[#a1a1aa]">
                     Based in Brazil. Open to editorial, campaigns, portrait
                     series and character-led visual work with strong atmosphere
                     and intentional direction.
@@ -347,10 +347,10 @@ export default function GalleryShell({
 
                 <div className="space-y-5">
                   <div className="h-px w-full bg-[rgba(243,239,231,0.10)]" />
-                  <p className="text-[10px] uppercase tracking-[0.32em] text-[#8ea4bf]">
+                  <p className="text-[10px] uppercase tracking-[0.38em] text-[#8ea4bf]">
                     São Paulo · Brazil
                   </p>
-                  <p className="text-[11px] uppercase tracking-[0.24em] text-[#a1a1aa]">
+                  <p className="text-[10px] uppercase tracking-[0.3em] text-[#a1a1aa]">
                     Booking · Editorial · Campaigns
                   </p>
 

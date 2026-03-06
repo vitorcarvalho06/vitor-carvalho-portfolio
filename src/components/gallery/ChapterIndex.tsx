@@ -180,7 +180,7 @@ export default function ChapterIndex({
         aria-label="Chapter index"
         className="pointer-events-none fixed right-7 top-1/2 z-30 hidden -translate-y-1/2 lg:block"
       >
-        <ol className="pointer-events-auto relative space-y-4 border border-[rgba(243,239,231,0.10)] bg-[#050505]/72 px-5 py-5 backdrop-blur-md">
+        <ol className="pointer-events-auto relative space-y-4 border border-[rgba(243,239,231,0.10)] bg-[#050505]/72 px-4 py-4 backdrop-blur-md">
           <span
             className="absolute bottom-5 left-[18px] top-5 w-px bg-[rgba(243,239,231,0.10)]"
             aria-hidden
@@ -203,21 +203,21 @@ export default function ChapterIndex({
                 <a
                   href={`#${chapter.id}`}
                   className={cn(
-                    "group flex flex-col gap-1 text-[11px] uppercase tracking-[0.22em] text-[#777] transition focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white",
+                    "group flex flex-col gap-1 text-[10px] uppercase tracking-[0.24em] text-[#777] transition focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white",
                     active && "text-[#f3efe7]",
                   )}
                   aria-label={`Ir para chapter ${chapter.number} ${chapter.title}`}
                 >
                   <span
                     className={cn(
-                      "text-[10px] tracking-[0.3em]",
+                      "text-[9px] tracking-[0.36em]",
                       active ? "text-[#8ea4bf]" : "text-[#6f7480]",
                     )}
                   >
                     {String(chapter.number).padStart(2, "0")}
                   </span>
 
-                  <span className="max-w-[16ch] leading-relaxed">
+                  <span className="max-w-[15ch] leading-[1.65]">
                     {chapter.title}
                   </span>
 

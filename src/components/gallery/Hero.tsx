@@ -72,13 +72,13 @@ export default function Hero({
           <div className="mx-auto flex h-20 w-full max-w-[1320px] items-center justify-between px-6 md:px-10">
             <a
               href="#gallery"
-              className="text-[11px] uppercase tracking-[0.34em] text-[#f3efe7] transition hover:text-white focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white"
+              className="text-[10px] uppercase tracking-[0.42em] text-[#f3efe7] transition hover:text-white focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white"
               aria-label="Ir para a galeria"
             >
               <span className="hidden md:inline">Vitor Carvalho</span>
               <span className="md:hidden">VC</span>
             </a>
-            <nav className="hidden items-center gap-8 text-[11px] uppercase tracking-[0.28em] text-[#a1a1aa] md:flex">
+            <nav className="hidden items-center gap-9 text-[10px] uppercase tracking-[0.34em] text-[#a1a1aa] md:flex">
               <a
                 href="#gallery"
                 className="transition hover:text-[#f5f5f5] focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white"
@@ -102,7 +102,7 @@ export default function Hero({
               href={INSTAGRAM_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="border border-white/15 bg-white/[0.03] px-3.5 py-1.5 text-[10px] uppercase tracking-[0.24em] text-[#f3efe7] transition hover:border-[rgba(142,164,191,0.45)] hover:bg-[rgba(142,164,191,0.08)] hover:text-white focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white"
+              className="border border-white/15 bg-white/[0.03] px-3.5 py-1.5 text-[10px] uppercase tracking-[0.28em] text-[#f3efe7] transition hover:border-[rgba(142,164,191,0.45)] hover:bg-[rgba(142,164,191,0.08)] hover:text-white focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white"
               aria-label="Abrir Instagram"
             >
               Instagram
@@ -155,21 +155,21 @@ export default function Hero({
                 ATMOSPHERE
               </motion.p>
 
-              <div className="relative z-10 max-w-2xl space-y-6">
-                <p className="text-[11px] uppercase tracking-[0.34em] text-[#8ea4bf]">
+              <div className="relative z-10 max-w-[760px] space-y-5 md:space-y-6">
+                <p className="text-[10px] uppercase tracking-[0.42em] text-[#8ea4bf]">
                   Vitor Carvalho
                 </p>
 
-                <h1 className="max-w-[12ch] text-[clamp(42px,5.6vw,88px)] font-semibold leading-[0.9] tracking-[-0.045em] text-[#f3efe7]">
+                <h1 className="max-w-[11ch] text-[clamp(44px,5.4vw,84px)] font-semibold leading-[0.88] tracking-[-0.05em] text-[#f3efe7]">
                   Portraits with tension, silence and atmosphere.
                 </h1>
 
-                <p className="max-w-[56ch] text-sm leading-relaxed tracking-[0.08em] text-[#a1a1aa] md:text-[15px]">
+                <p className="max-w-[50ch] text-[14px] leading-[1.8] tracking-[0.06em] text-[#a1a1aa] md:text-[15px]">
                   Editorial portraiture shaped by character, restraint, texture
                   and cinematic light.
                 </p>
 
-                <div className="flex flex-wrap items-center gap-4 pt-3">
+                <div className="flex flex-wrap items-center gap-4 pt-4">
                   <a
                     href="#chapters"
                     className="accent-glow border border-[rgba(243,239,231,0.18)] bg-white/[0.04] px-5 py-2.5 text-[11px] uppercase tracking-[0.24em] text-[#f3efe7] transition hover:border-[rgba(142,164,191,0.55)] hover:bg-[rgba(142,164,191,0.10)] hover:text-white focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white"
@@ -188,15 +188,15 @@ export default function Hero({
               </div>
             </div>
 
-            <div className="space-y-4 md:justify-self-end md:text-right">
+            <div className="space-y-3 md:justify-self-end md:text-right">
               <div className="h-px w-20 bg-[rgba(243,239,231,0.2)] md:ml-auto" />
-              <p className="text-[10px] uppercase tracking-[0.3em] text-[#8ea4bf]">
+              <p className="text-[10px] uppercase tracking-[0.34em] text-[#8ea4bf]">
                 Selected Frames
               </p>
-              <p className="text-sm uppercase tracking-[0.22em] text-[#f3efe7]">
+              <p className="text-[13px] uppercase tracking-[0.26em] text-[#f3efe7]">
                 {frameCount} images
               </p>
-              <p className="text-[11px] uppercase tracking-[0.22em] text-[#a1a1aa]">
+              <p className="text-[10px] uppercase tracking-[0.28em] text-[#a1a1aa]">
                 São Paulo · Brazil
               </p>
             </div>

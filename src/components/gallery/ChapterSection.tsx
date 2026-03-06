@@ -25,11 +25,11 @@ export default function ChapterSection({
       <FadeIn>
         <div
           className={cn(
-            "relative mx-auto mb-16 max-w-[1280px] px-6 md:mb-20 md:px-10",
+            "relative mx-auto mb-14 max-w-[1280px] px-6 md:mb-16 md:px-10",
             Number(chapter.number) % 2 === 0 ? "md:text-right" : "md:text-left",
           )}
         >
-          <p className="pointer-events-none absolute -top-10 left-6 select-none text-[clamp(96px,18vw,220px)] font-semibold leading-none tracking-[-0.08em] text-white/[0.04] md:left-10">
+          <p className="pointer-events-none absolute -top-8 left-6 select-none text-[clamp(92px,17vw,210px)] font-semibold leading-none tracking-[-0.085em] text-white/[0.035] md:left-10">
             {chapter.number}
           </p>
 
@@ -39,15 +39,15 @@ export default function ChapterSection({
               Number(chapter.number) % 2 === 0 && "md:ml-auto",
             )}
           >
-            <p className="text-[10px] uppercase tracking-[0.38em] text-[#8ea4bf]">
+            <p className="text-[10px] uppercase tracking-[0.42em] text-[#8ea4bf]">
               CHAPTER {chapter.number}
             </p>
 
-            <h3 className="mt-4 max-w-[10ch] text-[clamp(42px,7vw,112px)] font-semibold leading-[0.86] tracking-[-0.045em] text-[#f3efe7]">
+            <h3 className="mt-4 max-w-[9ch] text-[clamp(40px,6.5vw,104px)] font-semibold leading-[0.84] tracking-[-0.05em] text-[#f3efe7]">
               {chapter.title}
             </h3>
 
-            <p className="mt-6 max-w-[46ch] text-sm leading-relaxed tracking-[0.08em] text-[#a1a1aa]">
+            <p className="mt-5 max-w-[42ch] text-[14px] leading-[1.85] tracking-[0.06em] text-[#a1a1aa]">
               {chapter.description}
             </p>
           </div>
@@ -102,8 +102,10 @@ export default function ChapterSection({
               />
             </motion.div>
           </button>
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[rgba(243,239,231,0.08)] pt-4 text-[10px] uppercase tracking-[0.22em] text-[#a1a1aa]">
-            <span className="text-[#8ea4bf]">Featured Frame</span>
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[rgba(243,239,231,0.08)] pt-4 text-[10px] uppercase tracking-[0.26em] text-[#a1a1aa]">
+            <span className="tracking-[0.34em] text-[#8ea4bf]">
+              Featured Frame
+            </span>
             <span>{chapter.title}</span>
             <span>Click to expand</span>
           </div>
@@ -171,10 +173,10 @@ export default function ChapterSection({
           <div className="hidden lg:col-span-2 lg:block" aria-hidden>
             <div className="editorial-line h-full pl-8">
               <div className="sticky top-24 space-y-4 pt-2">
-                <p className="text-[10px] uppercase tracking-[0.32em] text-[#8ea4bf]">
+                <p className="text-[10px] uppercase tracking-[0.38em] text-[#8ea4bf]">
                   Sequence
                 </p>
-                <p className="max-w-[12ch] text-[11px] uppercase tracking-[0.22em] text-[#a1a1aa]">
+                <p className="max-w-[12ch] text-[10px] uppercase leading-relaxed tracking-[0.28em] text-[#a1a1aa]">
                   {chapter.title}
                 </p>
               </div>

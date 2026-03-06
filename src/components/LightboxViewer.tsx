@@ -337,7 +337,7 @@ export default function LightboxViewer({
 
               <div className="mt-8 space-y-6">
                 <div className="space-y-3">
-                  <p className="text-[10px] uppercase tracking-[0.34em] text-[#8ea4bf]">
+                  <p className="text-[9px] uppercase tracking-[0.42em] text-[#8ea4bf]">
                     {frameLabel}
                   </p>
 
@@ -350,11 +350,11 @@ export default function LightboxViewer({
                 </div>
 
                 <div className="space-y-4">
-                  <p className="text-[11px] uppercase tracking-[0.24em] text-[#a1a1aa]">
+                  <p className="text-[10px] uppercase tracking-[0.32em] text-[#a1a1aa]">
                     {sectionLabel}
                   </p>
 
-                  <h3 className="max-w-[12ch] text-[clamp(28px,3vw,42px)] font-semibold leading-[0.92] tracking-[-0.04em] text-[#f3efe7]">
+                  <h3 className="max-w-[11ch] text-[clamp(28px,2.8vw,40px)] font-semibold leading-[0.9] tracking-[-0.045em] text-[#f3efe7]">
                     {currentItem.title}
                   </h3>
 
@@ -362,7 +362,7 @@ export default function LightboxViewer({
                     {currentItem.slug}
                   </p>
 
-                  <p className="max-w-[34ch] text-sm leading-relaxed tracking-[0.07em] text-[#a1a1aa]">
+                  <p className="max-w-[32ch] text-[14px] leading-[1.8] tracking-[0.06em] text-[#a1a1aa]">
                     {description}
                   </p>
                 </div>
