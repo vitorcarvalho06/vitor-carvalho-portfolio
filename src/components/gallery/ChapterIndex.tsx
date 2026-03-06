@@ -180,26 +180,51 @@ export default function ChapterIndex({
         aria-label="Chapter index"
         className="pointer-events-none fixed right-7 top-1/2 z-30 hidden -translate-y-1/2 lg:block"
       >
-        <ol className="pointer-events-auto space-y-2 border border-white/10 bg-[#0a0a0a]/70 px-4 py-4 backdrop-blur-md">
+        <ol className="pointer-events-auto relative space-y-4 border border-[rgba(243,239,231,0.10)] bg-[#050505]/72 px-5 py-5 backdrop-blur-md">
+          <span
+            className="absolute bottom-5 left-[18px] top-5 w-px bg-[rgba(243,239,231,0.10)]"
+            aria-hidden
+          />
+
           {chapters.map((chapter) => {
             const active = activeChapterId === chapter.id;
 
             return (
-              <li key={chapter.id}>
+              <li key={chapter.id} className="relative pl-5">
+                <span
+                  className={cn(
+                    "absolute left-[1px] top-1.5 h-2.5 w-2.5 rounded-full border border-[rgba(243,239,231,0.20)] bg-[#050505] transition",
+                    active &&
+                      "border-[rgba(142,164,191,0.55)] bg-[rgba(142,164,191,0.18)] shadow-[0_0_0_6px_rgba(142,164,191,0.07)]",
+                  )}
+                  aria-hidden
+                />
+
                 <a
                   href={`#${chapter.id}`}
                   className={cn(
-                    "group inline-flex items-center gap-3 text-[11px] uppercase tracking-[0.22em] text-[#9ca3af] transition focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white",
-                    active && "text-[#f5f5f5]",
+                    "group flex flex-col gap-1 text-[11px] uppercase tracking-[0.22em] text-[#777] transition focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white",
+                    active && "text-[#f3efe7]",
                   )}
                   aria-label={`Ir para chapter ${chapter.number} ${chapter.title}`}
                 >
-                  <span>{chapter.number}</span>
-                  <span>{chapter.title}</span>
                   <span
                     className={cn(
-                      "h-px w-5 bg-white/0 transition group-hover:bg-white/30",
-                      active && "bg-white/55",
+                      "text-[10px] tracking-[0.3em]",
+                      active ? "text-[#8ea4bf]" : "text-[#6f7480]",
+                    )}
+                  >
+                    {String(chapter.number).padStart(2, "0")}
+                  </span>
+
+                  <span className="max-w-[16ch] leading-relaxed">
+                    {chapter.title}
+                  </span>
+
+                  <span
+                    className={cn(
+                      "h-px w-0 bg-[rgba(142,164,191,0.45)] transition-all duration-300 group-hover:w-8",
+                      active && "w-8",
                     )}
                   />
                 </a>

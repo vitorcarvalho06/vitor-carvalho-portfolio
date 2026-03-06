@@ -56,7 +56,8 @@ export default function GalleryShell({
     const frameSlug = searchParams.get("frame");
 
     if (frameSlug) {
-      const index = frameIndexMap.get(frameSlug) ?? getFrameIndexBySlug(frameSlug);
+      const index =
+        frameIndexMap.get(frameSlug) ?? getFrameIndexBySlug(frameSlug);
 
       if (index >= 0 && index < allFrames.length) {
         return { mode: "frame", index };
@@ -67,7 +68,8 @@ export default function GalleryShell({
 
     if (featuredSlug) {
       const index =
-        featuredIndexMap.get(featuredSlug) ?? getFeaturedIndexBySlug(featuredSlug);
+        featuredIndexMap.get(featuredSlug) ??
+        getFeaturedIndexBySlug(featuredSlug);
 
       if (index >= 0 && index < featuredFrames.length) {
         return { mode: "featured", index };
@@ -75,7 +77,13 @@ export default function GalleryShell({
     }
 
     return null;
-  }, [searchParams, frameIndexMap, featuredIndexMap, allFrames.length, featuredFrames.length]);
+  }, [
+    searchParams,
+    frameIndexMap,
+    featuredIndexMap,
+    allFrames.length,
+    featuredFrames.length,
+  ]);
 
   const setViewerQuery = useCallback(
     (nextViewerState: ViewerState | null) => {
@@ -173,7 +181,8 @@ export default function GalleryShell({
             b.boundingClientRect.top + b.boundingClientRect.height / 2;
 
           return (
-            Math.abs(aCenter - viewportCenter) - Math.abs(bCenter - viewportCenter)
+            Math.abs(aCenter - viewportCenter) -
+            Math.abs(bCenter - viewportCenter)
           );
         })[0];
 
@@ -232,7 +241,8 @@ export default function GalleryShell({
       const frameIndex = frameIndexMap.get(slug);
 
       if (frameIndex !== undefined) {
-        openerRef.current = trigger ?? (document.activeElement as HTMLElement | null);
+        openerRef.current =
+          trigger ?? (document.activeElement as HTMLElement | null);
         setViewerQuery({ mode: "frame", index: frameIndex });
         return;
       }
@@ -240,7 +250,8 @@ export default function GalleryShell({
       const featuredIndex = featuredIndexMap.get(slug);
 
       if (featuredIndex !== undefined) {
-        openerRef.current = trigger ?? (document.activeElement as HTMLElement | null);
+        openerRef.current =
+          trigger ?? (document.activeElement as HTMLElement | null);
         setViewerQuery({ mode: "featured", index: featuredIndex });
       }
     },
@@ -266,7 +277,7 @@ export default function GalleryShell({
   );
 
   return (
-    <div className="bg-[#0a0a0a] text-[#f5f5f5]">
+    <div className="bg-[#050505] text-[#f3efe7]">
       <Hero
         heroImage={heroImage}
         frameCount={allFrames.length}
@@ -292,37 +303,57 @@ export default function GalleryShell({
 
         <section
           id="contact"
-          className="scroll-mt-28 border-t border-white/10 py-20 md:py-28"
+          className="scroll-mt-28 border-t border-[rgba(243,239,231,0.10)] py-24 md:py-32"
         >
-          <div className="mx-auto w-full max-w-[1200px] px-6 md:px-10">
-            <div className="border border-white/10 bg-white/[0.02] px-6 py-8 md:px-10 md:py-10">
-              <p className="text-[10px] uppercase tracking-[0.34em] text-[#9ca3af]">
-                Contact
-              </p>
-              <h2 className="mt-4 text-[clamp(34px,4.2vw,64px)] font-semibold leading-[0.94] tracking-[-0.02em] text-[#f5f5f5]">
-                Bookings
-                <br />
-                &amp; Collaborations
-              </h2>
-              <p className="mt-6 text-xs uppercase tracking-[0.18em] text-[#9ca3af]">
-                São Paulo · Available for commissioned work
-              </p>
+          <div className="mx-auto w-full max-w-[1320px] px-6 md:px-10">
+            <div className="noise-overlay relative overflow-hidden border border-[rgba(243,239,231,0.10)] bg-white/[0.03] px-6 py-10 md:px-10 md:py-14">
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(142,164,191,0.14),transparent_24%)]" />
 
-              <div className="mt-8 flex flex-wrap gap-3">
-                <a
-                  href={BOOKING_MAILTO}
-                  className="border border-white/30 bg-[#f5f5f5] px-5 py-2.5 text-[11px] uppercase tracking-[0.24em] text-[#0a0a0a] transition hover:border-white hover:bg-white focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white"
-                >
-                  Request booking
-                </a>
-                <a
-                  href={INSTAGRAM_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="border border-white/20 px-5 py-2.5 text-[11px] uppercase tracking-[0.24em] text-[#9ca3af] transition hover:border-white/45 hover:text-[#f5f5f5] focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white"
-                >
-                  Instagram
-                </a>
+              <div className="relative z-10 grid gap-12 md:grid-cols-[minmax(0,1fr)_320px] md:items-end">
+                <div className="max-w-3xl">
+                  <p className="text-[10px] uppercase tracking-[0.34em] text-[#8ea4bf]">
+                    Contact
+                  </p>
+
+                  <h2 className="mt-5 max-w-[12ch] text-[clamp(38px,5vw,80px)] font-semibold leading-[0.9] tracking-[-0.045em] text-[#f3efe7]">
+                    Available for selected commissions and visual
+                    collaborations.
+                  </h2>
+
+                  <p className="mt-6 max-w-[58ch] text-sm leading-relaxed tracking-[0.08em] text-[#a1a1aa]">
+                    Based in Brazil. Open to editorial, campaigns, portrait
+                    series and character-led visual work with strong atmosphere
+                    and intentional direction.
+                  </p>
+                </div>
+
+                <div className="space-y-5">
+                  <div className="h-px w-full bg-[rgba(243,239,231,0.10)]" />
+                  <p className="text-[10px] uppercase tracking-[0.32em] text-[#8ea4bf]">
+                    São Paulo · Brazil
+                  </p>
+                  <p className="text-[11px] uppercase tracking-[0.24em] text-[#a1a1aa]">
+                    Booking · Editorial · Campaigns
+                  </p>
+
+                  <div className="flex flex-wrap gap-3 pt-2">
+                    <a
+                      href={BOOKING_MAILTO}
+                      className="accent-glow border border-[rgba(243,239,231,0.18)] bg-[#f3efe7] px-5 py-2.5 text-[11px] uppercase tracking-[0.24em] text-[#050505] transition hover:border-white hover:bg-white focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white"
+                    >
+                      Request Booking
+                    </a>
+
+                    <a
+                      href={INSTAGRAM_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="border border-[rgba(243,239,231,0.18)] bg-white/[0.04] px-5 py-2.5 text-[11px] uppercase tracking-[0.24em] text-[#f3efe7] transition hover:border-[rgba(142,164,191,0.55)] hover:bg-[rgba(142,164,191,0.08)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-white"
+                    >
+                      Instagram
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
