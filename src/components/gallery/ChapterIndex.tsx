@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -124,7 +122,10 @@ export default function ChapterIndex({
 
   return (
     <>
-      <section id="chapters" className="border-t border-white/10 py-20 md:py-24">
+      <section
+        id="chapters"
+        className="border-t border-white/10 py-20 md:py-24"
+      >
         <div className="mx-auto grid w-full max-w-[1200px] gap-12 px-6 md:grid-cols-[minmax(0,1fr)_220px] md:px-10">
           <div className="space-y-6">
             <h2 className="text-sm uppercase tracking-[0.3em] text-[#9ca3af]">
@@ -153,7 +154,9 @@ export default function ChapterIndex({
               <button
                 type="button"
                 key={preview.name}
-                onClick={(event) => onOpenViewer(preview.slug, event.currentTarget)}
+                onClick={(event) =>
+                  onOpenViewer(preview.slug, event.currentTarget)
+                }
                 className="relative h-28 w-44 overflow-hidden border border-white/10"
                 aria-label={`Abrir imagem ${preview.alt}`}
               >
